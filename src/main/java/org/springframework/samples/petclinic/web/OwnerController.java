@@ -76,31 +76,74 @@ public class OwnerController {
         return "owners/findOwners";
     }
 
-    @GetMapping(value = "/owners")
-    public String processFindForm(Owner owner, BindingResult result, Map<String, Object> model) {
+@RequestMapping(value = "/owners", method = RequestMethod.GET)
+public String processFindForm(Owner owner, BindingResult result, Map<String, Object> model) {
 
-        // allow parameterless GET request for /owners to return all records
-        if (owner.getLastName() == null) {
-            owner.setLastName(""); // empty string signifies broadest possible search
-        }
+	// allow parameterless GET request for /owners to return all records
+	if (owner.getLastName() == null) {
+		owner.setLastName(""); // empty string signifies broadest possible search
+	}
 
-        // find owners by last name
-        Collection<Owner> results = this.clinicService.findOwnerByLastName(owner.getLastName());
-        if (results.isEmpty()) {
-            // no owners found
-            result.rejectValue("lastName", "notFound", "not found");
-            return "owners/findOwners";
-        } else if (results.size() == 1) {
-            // 1 owner found
-            owner = results.iterator().next();
-            return "redirect:/owners/" + owner.getId();
-        } else {
-            // multiple owners found
-            model.put("selections", results);
-            return "owners/ownersList";
-        }
-    }
+	// find owners by last name
+	Collection<Owner> results = this.clinicService.findOwnerByLastName(owner.getLastName());
+	if (results.isEmpty()) {
+		// no owners found
+		result.rejectValue("lastName", "notFound", "not found");
+		return "owners/findOwners";
+	} else if (results.size() == 1) {
+		// 1 owner found
+		owner = results.iterator().next();
+		return "redirect:/owners/" + owner.getId();
+	} else {
+	      // multiple owners found
+		for (Owner ownerItem : results) {
+			String initNum = ownerItem.getTelephone().substring(0, 3);
+			if (!isInternetTel(initNum)) {
+				if ("Seoul".equals(ownerItem.getCity())) {
+					ownerItem.setTelephone("02-" + ownerItem.getTelephone());
+				} else if ("Busan".equals(ownerItem.getCity())) {
+					ownerItem.setTelephone("051-" + ownerItem.getTelephone());
+				} else if ("Daegu".equals(ownerItem.getCity())) {
+					ownerItem.setTelephone("053-" + ownerItem.getTelephone());
+				} else if ("Incheon".equals(ownerItem.getCity())) {
+					ownerItem.setTelephone("032-" + ownerItem.getTelephone());
+				} else if ("Gwangju".equals(ownerItem.getCity())) {
+					ownerItem.setTelephone("062-" + ownerItem.getTelephone());
+				} else if ("Daejeon".equals(ownerItem.getCity())) {
+					ownerItem.setTelephone("042-" + ownerItem.getTelephone());
+				} else if ("Ulsan".equals(ownerItem.getCity())) {
+					ownerItem.setTelephone("052-" + ownerItem.getTelephone());
+				} else if ("Sejong".equals(ownerItem.getCity())) {
+					ownerItem.setTelephone("044-" + ownerItem.getTelephone());
+				} else if ("Gyeonggi".equals(ownerItem.getCity())) {
+					ownerItem.setTelephone("031-" + ownerItem.getTelephone());
+				} else if ("Gangwon".equals(ownerItem.getCity())) {
+					ownerItem.setTelephone("033-" + ownerItem.getTelephone());
+				} else if ("Chungcheongbuk".equals(ownerItem.getCity())) {
+					ownerItem.setTelephone("043-" + ownerItem.getTelephone());
+				} else if ("Chungcheongnam".equals(ownerItem.getCity())) {
+					ownerItem.setTelephone("041-" + ownerItem.getTelephone());
+				} else if ("Jeonbuk".equals(ownerItem.getCity())) {
+					ownerItem.setTelephone("063-" + ownerItem.getTelephone());
+				} else if ("Jeonnam".equals(ownerItem.getCity())) {
+					ownerItem.setTelephone("061-" + ownerItem.getTelephone());
+				} else if ("Gyeongbuk".equals(ownerItem.getCity())) {
+					ownerItem.setTelephone("054-" + ownerItem.getTelephone());
+				} else if ("Gyeongnam".equals(ownerItem.getCity())) {
+					ownerItem.setTelephone("055-" + ownerItem.getTelephone());
+				} else if ("Jeju".equals(ownerItem.getCity())) {
+					ownerItem.setTelephone("064-" + ownerItem.getTelephone());
+				}
+			}
+		}
+		model.put("selections", results);
+		return "owners/ownersList";
+	}
+}
 
+private boolean isInternetTel(String initNum) {
+	return initNum == "070";
+}
     @GetMapping(value = "/owners/{ownerId}/edit")
     public String initUpdateOwnerForm(@PathVariable("ownerId") int ownerId, Model model) {
         Owner owner = this.clinicService.findOwnerById(ownerId);
