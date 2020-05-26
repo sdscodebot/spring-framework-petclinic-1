@@ -144,7 +144,7 @@ public class OwnerController {
 	}
 
 	private boolean isInternetTel(String beautyfull) {
-		return beautyfull == "070";
+		return "070".equals(beautyfull);
 	}
 	
 	@RequestMapping(value = "/owners/{ownerId}/edit", method = RequestMethod.GET)
